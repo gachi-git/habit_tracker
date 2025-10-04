@@ -5,6 +5,9 @@
                 {{ $habit->name }}
             </h2>
             <div class="flex space-x-2">
+                <a href="{{ route('habit-records.index', $habit) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    記録を見る
+                </a>
                 <a href="{{ route('habits.edit', $habit) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                     編集
                 </a>

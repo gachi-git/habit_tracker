@@ -12,11 +12,19 @@ class HabitsController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $activeHabits = $user->habits()->where('is_active', true)->with('category')->get();
+        $activeHabits = $user->habits()->where('is_active', true)->with(['category', 'habitRecords'])->get();
         $totalHabits = $user->habits()->count();
         $recentHabits = $user->habits()->latest()->take(5)->with('category')->get();
         
-        return view('dashboard', compact('activeHabits', 'totalHabits', 'recentHabits'));
+        // 今日の記録状況を取得
+        $today = now()->format('Y-m-d');
+        $todayRecords = [];
+        foreach ($activeHabits as $habit) {
+            $record = $habit->habitRecords()->where('recorded_date', $today)->first();
+            $todayRecords[$habit->id] = $record;
+        }
+        
+        return view('dashboard', compact('activeHabits', 'totalHabits', 'recentHabits', 'todayRecords'));
     }
 
     public function index()

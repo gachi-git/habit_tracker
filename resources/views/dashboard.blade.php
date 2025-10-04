@@ -41,10 +41,10 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-purple-600">0</div>
+                            <div class="text-3xl font-bold text-purple-600">{{ collect($todayRecords)->filter()->where('completed', true)->count() }}</div>
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-600">今日の完了</div>
-                                <div class="text-xs text-gray-500">今後実装予定</div>
+                                <div class="text-xs text-gray-500">{{ $activeHabits->count() }}個中</div>
                             </div>
                         </div>
                     </div>
@@ -61,19 +61,46 @@
                     </div>
                     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         @foreach($activeHabits as $habit)
-                            <div class="border rounded-lg p-4 bg-gray-50">
+                            <div class="border rounded-lg p-4 {{ isset($todayRecords[$habit->id]) && $todayRecords[$habit->id]->completed ? 'bg-green-50 border-green-200' : 'bg-gray-50' }}">
                                 <div class="flex justify-between items-start mb-2">
                                     <h4 class="font-semibold text-gray-900">{{ $habit->name }}</h4>
-                                    @if($habit->category)
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {{ $habit->category->name }}
-                                        </span>
-                                    @endif
+                                    <div class="flex items-center space-x-1">
+                                        @if(isset($todayRecords[$habit->id]))
+                                            @if($todayRecords[$habit->id]->completed)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    ✓ 完了
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    記録済
+                                                </span>
+                                            @endif
+                                        @endif
+                                        @if($habit->category)
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                {{ $habit->category->name }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-2">{{ $habit->target_frequency }}回 / {{ $habit->target_unit === 'daily' ? '日' : ($habit->target_unit === 'weekly' ? '週' : '月') }}</p>
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('habits.show', $habit) }}" class="text-blue-600 hover:text-blue-900 text-sm">詳細</a>
-                                    <button class="text-green-600 hover:text-green-900 text-sm">記録する</button>
+                                <p class="text-sm text-gray-600 mb-3">{{ $habit->target_frequency }}回 / {{ $habit->target_unit === 'daily' ? '日' : ($habit->target_unit === 'weekly' ? '週' : '月') }}</p>
+                                
+                                <div class="flex justify-between items-center">
+                                    <div class="flex space-x-2">
+                                        <a href="{{ route('habits.show', $habit) }}" class="text-blue-600 hover:text-blue-900 text-sm">詳細</a>
+                                        <a href="{{ route('habit-records.index', $habit) }}" class="text-purple-600 hover:text-purple-900 text-sm">記録</a>
+                                    </div>
+                                    
+                                    @if(!isset($todayRecords[$habit->id]))
+                                        <form method="POST" action="{{ route('habit-records.store', $habit) }}" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="recorded_date" value="{{ date('Y-m-d') }}">
+                                            <input type="hidden" name="completed" value="1">
+                                            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white text-xs font-medium py-1 px-2 rounded">
+                                                今日完了
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
