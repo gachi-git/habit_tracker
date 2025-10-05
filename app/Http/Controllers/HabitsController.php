@@ -9,12 +9,24 @@ use Illuminate\Support\Facades\Auth;
 
 class HabitsController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $user = Auth::user();
-        $activeHabits = $user->habits()->where('is_active', true)->with(['category', 'habitRecords'])->get();
+        $categoryFilter = $request->get('category');
+        
+        $activeHabitsQuery = $user->habits()->where('is_active', true)->with(['category', 'habitRecords']);
+        if ($categoryFilter && $categoryFilter !== 'all') {
+            if ($categoryFilter === 'none') {
+                $activeHabitsQuery->whereNull('category_id');
+            } else {
+                $activeHabitsQuery->where('category_id', $categoryFilter);
+            }
+        }
+        $activeHabits = $activeHabitsQuery->get();
+        
         $totalHabits = $user->habits()->count();
         $recentHabits = $user->habits()->latest()->take(5)->with('category')->get();
+        $categories = $user->categories()->withCount('habits')->get();
         
         // 今日の記録状況を取得
         $today = now()->format('Y-m-d');
@@ -24,7 +36,37 @@ class HabitsController extends Controller
             $todayRecords[$habit->id] = $record;
         }
         
-        return view('dashboard', compact('activeHabits', 'totalHabits', 'recentHabits', 'todayRecords'));
+        // 統計情報を取得
+        $totalCurrentStreak = $activeHabits->sum(fn($habit) => $habit->getCurrentStreak());
+        $totalRecordsThisWeek = 0;
+        $avgWeeklyCompletionRate = 0;
+        
+        if ($activeHabits->count() > 0) {
+            $weeklyRates = $activeHabits->map(fn($habit) => $habit->getThisWeekCompletionRate());
+            $avgWeeklyCompletionRate = $weeklyRates->avg();
+            
+            foreach ($activeHabits as $habit) {
+                $totalRecordsThisWeek += $habit->habitRecords()
+                    ->where('completed', true)
+                    ->whereBetween('recorded_date', [
+                        now()->startOfWeek()->format('Y-m-d'),
+                        now()->endOfWeek()->format('Y-m-d')
+                    ])
+                    ->count();
+            }
+        }
+        
+        return view('dashboard', compact(
+            'activeHabits', 
+            'totalHabits', 
+            'recentHabits', 
+            'todayRecords',
+            'totalCurrentStreak',
+            'totalRecordsThisWeek',
+            'avgWeeklyCompletionRate',
+            'categories',
+            'categoryFilter'
+        ));
     }
 
     public function index()

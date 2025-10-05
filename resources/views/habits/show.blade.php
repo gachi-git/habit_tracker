@@ -73,13 +73,58 @@
                         <!-- 統計情報 -->
                         <div>
                             <h3 class="text-lg font-semibold mb-4">統計情報</h3>
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="text-center">
-                                    <p class="text-gray-600">統計機能は今後実装予定です</p>
-                                    <div class="mt-4 space-y-2 text-sm">
-                                        <p>・継続日数</p>
-                                        <p>・達成率</p>
-                                        <p>・最近の記録</p>
+                            <div class="bg-gray-50 rounded-lg p-4 space-y-4">
+                                <!-- ストリーク情報 -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600">{{ $habit->getCurrentStreak() }}</div>
+                                        <div class="text-xs text-gray-600">現在の連続日数</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-blue-600">{{ $habit->getLongestStreak() }}</div>
+                                        <div class="text-xs text-gray-600">最長記録</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 達成率 -->
+                                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-purple-600">{{ number_format($habit->getThisWeekCompletionRate(), 1) }}%</div>
+                                        <div class="text-xs text-gray-600">今週の達成率</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-orange-600">{{ number_format($habit->getThisMonthCompletionRate(), 1) }}%</div>
+                                        <div class="text-xs text-gray-600">今月の達成率</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 総合統計 -->
+                                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-gray-700">{{ $habit->getTotalRecords() }}</div>
+                                        <div class="text-xs text-gray-600">総実行回数</div>
+                                    </div>
+                                    <div class="text-center">
+                                        @if($habit->getAverageDuration() > 0)
+                                            <div class="text-2xl font-bold text-indigo-600">{{ number_format($habit->getAverageDuration(), 0) }}分</div>
+                                            <div class="text-xs text-gray-600">平均実施時間</div>
+                                        @else
+                                            <div class="text-2xl font-bold text-gray-400">-</div>
+                                            <div class="text-xs text-gray-600">平均実施時間</div>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <!-- 最近7日間のアクティビティ -->
+                                <div class="pt-4 border-t border-gray-200">
+                                    <div class="text-sm font-medium text-gray-600 mb-2">最近7日間の活動</div>
+                                    <div class="flex justify-between">
+                                        @foreach($habit->getRecentActivity() as $activity)
+                                            <div class="text-center">
+                                                <div class="w-6 h-6 mx-auto rounded {{ $activity['completed'] ? 'bg-green-500' : 'bg-gray-300' }} mb-1"></div>
+                                                <div class="text-xs text-gray-500">{{ $activity['day'] }}</div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

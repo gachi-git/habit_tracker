@@ -25,16 +25,31 @@
                         </div>
 
                         <div class="mb-4">
-                            <x-input-label for="category_id" :value="__('カテゴリ（任意）')" />
+                            <div class="flex justify-between items-center">
+                                <x-input-label for="category_id" :value="__('カテゴリ（任意）')" />
+                                <a href="{{ route('categories.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">新しいカテゴリを作成</a>
+                            </div>
                             <select id="category_id" name="category_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <option value="">カテゴリを選択</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    <option value="{{ $category->id }}" {{ old('category_id', request('category')) == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                            
+                            @if($categories->count() > 0)
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach($categories as $category)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white cursor-pointer" 
+                                              style="background-color: {{ $category->color }}"
+                                              onclick="document.getElementById('category_id').value='{{ $category->id }}'">
+                                            {{ $category->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
 
                         <div class="mb-4">

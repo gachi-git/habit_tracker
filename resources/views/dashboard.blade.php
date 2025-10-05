@@ -12,15 +12,68 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <!-- カテゴリフィルタ -->
+            @if($categories->count() > 0 || $activeHabits->whereNull('category_id')->count() > 0)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4">
+                    <div class="flex items-center space-x-2 overflow-x-auto">
+                        <span class="text-sm font-medium text-gray-700 whitespace-nowrap">フィルタ:</span>
+                        <a href="{{ route('dashboard') }}" 
+                           class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors {{ !$categoryFilter || $categoryFilter === 'all' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200' }}">
+                            すべて ({{ $totalHabits }})
+                        </a>
+                        @if($activeHabits->whereNull('category_id')->count() > 0)
+                            <a href="{{ route('dashboard', ['category' => 'none']) }}" 
+                               class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors {{ $categoryFilter === 'none' ? 'bg-gray-600 text-white border-gray-600' : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200' }}">
+                                カテゴリなし ({{ $activeHabits->whereNull('category_id')->count() }})
+                            </a>
+                        @endif
+                        @foreach($categories as $category)
+                            @if($category->habits_count > 0)
+                                <a href="{{ route('dashboard', ['category' => $category->id]) }}" 
+                                   class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors text-white {{ $categoryFilter == $category->id ? 'ring-2 ring-offset-2 ring-gray-500' : 'hover:ring-1 hover:ring-offset-1 hover:ring-gray-400' }}"
+                                   style="background-color: {{ $category->color }}; border-color: {{ $category->color }};">
+                                    {{ $category->name }} ({{ $category->habits_count }})
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- フィルタ説明 -->
+            @if($categoryFilter && $categoryFilter !== 'all')
+            <div class="bg-white border border-blue-200 rounded-lg p-3 shadow-sm">
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm text-gray-900 font-medium">
+                        @if($categoryFilter === 'none')
+                            カテゴリなしの習慣のみ表示中
+                        @else
+                            {{ $categories->where('id', $categoryFilter)->first()?->name }}カテゴリの習慣のみ表示中
+                        @endif
+                        （{{ $activeHabits->count() }}個）
+                    </span>
+                </div>
+            </div>
+            @endif
+
             <!-- 統計カード -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-blue-600">{{ $totalHabits }}</div>
+                            <div class="text-3xl font-bold text-blue-600">{{ $categoryFilter && $categoryFilter !== 'all' ? $activeHabits->count() : $totalHabits }}</div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-600">総習慣数</div>
-                                <div class="text-xs text-gray-500">登録済みの習慣</div>
+                                <div class="text-sm font-medium text-gray-600">
+                                    {{ $categoryFilter && $categoryFilter !== 'all' ? '表示中習慣数' : '総習慣数' }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ $categoryFilter && $categoryFilter !== 'all' ? 'フィルタ適用中' : '登録済み' }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -31,8 +84,8 @@
                         <div class="flex items-center">
                             <div class="text-3xl font-bold text-green-600">{{ $activeHabits->count() }}</div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-600">アクティブな習慣</div>
-                                <div class="text-xs text-gray-500">現在取り組み中</div>
+                                <div class="text-sm font-medium text-gray-600">アクティブ</div>
+                                <div class="text-xs text-gray-500">実行中</div>
                             </div>
                         </div>
                     </div>
@@ -45,6 +98,30 @@
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-600">今日の完了</div>
                                 <div class="text-xs text-gray-500">{{ $activeHabits->count() }}個中</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="text-3xl font-bold text-orange-600">{{ $totalCurrentStreak }}</div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-600">合計ストリーク</div>
+                                <div class="text-xs text-gray-500">連続日数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="text-3xl font-bold text-indigo-600">{{ number_format($avgWeeklyCompletionRate, 0) }}%</div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-600">今週達成率</div>
+                                <div class="text-xs text-gray-500">平均</div>
                             </div>
                         </div>
                     </div>
@@ -83,7 +160,12 @@
                                         @endif
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-3">{{ $habit->target_frequency }}回 / {{ $habit->target_unit === 'daily' ? '日' : ($habit->target_unit === 'weekly' ? '週' : '月') }}</p>
+                                <p class="text-sm text-gray-600 mb-1">{{ $habit->target_frequency }}回 / {{ $habit->target_unit === 'daily' ? '日' : ($habit->target_unit === 'weekly' ? '週' : '月') }}</p>
+                                
+                                <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
+                                    <span>🔥 {{ $habit->getCurrentStreak() }}日連続</span>
+                                    <span>📊 {{ number_format($habit->getThisWeekCompletionRate(), 0) }}%</span>
+                                </div>
                                 
                                 <div class="flex justify-between items-center">
                                     <div class="flex space-x-2">

@@ -122,8 +122,7 @@ class Habits extends Model
         if ($this->target_unit === 'daily') {
             $targetCount = $totalDays * $this->target_frequency;
         } elseif ($this->target_unit === 'weekly') {
-            $weeks = ceil($totalDays / 7);
-            $targetCount = $weeks * $this->target_frequency;
+            $targetCount = $this->target_frequency;
         } else { // monthly
             $months = $startDate->diffInMonths($endDate) + 1;
             $targetCount = $months * $this->target_frequency;
@@ -134,7 +133,8 @@ class Habits extends Model
             ->whereBetween('recorded_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->count();
 
-        return $targetCount > 0 ? min(($completedCount / $targetCount) * 100, 100) : 0;
+
+        return $targetCount > 0 ? ($completedCount / $targetCount) * 100 : 0;
     }
 
     /**

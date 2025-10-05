@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('habits.index')" :active="request()->routeIs('habits.*')">
                         {{ __('習慣管理') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                        {{ __('カテゴリ管理') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -75,6 +78,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('habits.index')" :active="request()->routeIs('habits.*')">
                 {{ __('習慣管理') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                {{ __('カテゴリ管理') }}
             </x-responsive-nav-link>
         </div>
 
