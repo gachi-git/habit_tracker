@@ -76,25 +76,39 @@
                             <div class="bg-gray-50 rounded-lg p-4 space-y-4">
                                 <!-- ストリーク情報 -->
                                 <div class="grid grid-cols-2 gap-4">
+                                    @php
+                                        $streakUnit = match($habit->target_unit) {
+                                            'daily' => '日',
+                                            'weekly' => '週',  
+                                            'monthly' => '月',
+                                            default => '日'
+                                        };
+                                    @endphp
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-green-600">{{ $habit->getCurrentStreak() }}</div>
-                                        <div class="text-xs text-gray-600">現在の連続日数</div>
+                                        <div class="text-xs text-gray-600">現在の連続{{ $streakUnit }}数</div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-blue-600">{{ $habit->getLongestStreak() }}</div>
-                                        <div class="text-xs text-gray-600">最長記録</div>
+                                        <div class="text-xs text-gray-600">最長記録（{{ $streakUnit }}）</div>
                                     </div>
                                 </div>
                                 
                                 <!-- 達成率 -->
-                                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-purple-600">{{ number_format($habit->getThisWeekCompletionRate(), 1) }}%</div>
-                                        <div class="text-xs text-gray-600">今週の達成率</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-orange-600">{{ number_format($habit->getThisMonthCompletionRate(), 1) }}%</div>
-                                        <div class="text-xs text-gray-600">今月の達成率</div>
+                                <div class="pt-4 border-t border-gray-200">
+                                    @php
+                                        $detailedStats = $habit->getDetailedStats();
+                                        $colors = ['purple-600', 'orange-600', 'green-600', 'blue-600'];
+                                    @endphp
+                                    <div class="grid grid-cols-{{ min(count($detailedStats), 3) }} gap-4">
+                                        @foreach ($detailedStats as $index => $stat)
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-{{ $colors[$index % count($colors)] }}">
+                                                    {{ number_format($stat['rate'], 1) }}%
+                                                </div>
+                                                <div class="text-xs text-gray-600">{{ $stat['label'] }}の達成率</div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                                 

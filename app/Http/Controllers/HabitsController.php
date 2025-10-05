@@ -37,14 +37,10 @@ class HabitsController extends Controller
         }
         
         // 統計情報を取得
-        $totalCurrentStreak = $activeHabits->sum(fn($habit) => $habit->getCurrentStreak());
+        $activeStreakCount = $activeHabits->filter(fn($habit) => $habit->getCurrentStreak() > 0)->count();
         $totalRecordsThisWeek = 0;
-        $avgWeeklyCompletionRate = 0;
         
         if ($activeHabits->count() > 0) {
-            $weeklyRates = $activeHabits->map(fn($habit) => $habit->getThisWeekCompletionRate());
-            $avgWeeklyCompletionRate = $weeklyRates->avg();
-            
             foreach ($activeHabits as $habit) {
                 $totalRecordsThisWeek += $habit->habitRecords()
                     ->where('completed', true)
@@ -64,9 +60,8 @@ class HabitsController extends Controller
             'totalHabits', 
             'recentHabits', 
             'todayRecords',
-            'totalCurrentStreak',
+            'activeStreakCount',
             'totalRecordsThisWeek',
-            'avgWeeklyCompletionRate',
             'categories',
             'categoryFilter',
             'chartData'
@@ -90,7 +85,15 @@ class HabitsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    if ($value && !Auth::user()->categories()->where('id', $value)->exists()) {
+                        $fail('選択されたカテゴリは無効です。');
+                    }
+                }
+            ],
             'target_frequency' => 'required|integer|min:1',
             'target_unit' => 'required|in:daily,weekly,monthly'
         ]);
@@ -103,21 +106,41 @@ class HabitsController extends Controller
 
     public function show(Habits $habit)
     {
+        if ($habit->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
         return view('habits.show', compact('habit'));
     }
 
     public function edit(Habits $habit)
     {
+        if ($habit->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
         $categories = Auth::user()->categories;
         return view('habits.edit', compact('habit', 'categories'));
     }
 
     public function update(Request $request, Habits $habit)
     {
+        if ($habit->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    if ($value && !Auth::user()->categories()->where('id', $value)->exists()) {
+                        $fail('選択されたカテゴリは無効です。');
+                    }
+                }
+            ],
             'target_frequency' => 'required|integer|min:1',
             'target_unit' => 'required|in:daily,weekly,monthly',
         ]);
@@ -133,6 +156,10 @@ class HabitsController extends Controller
 
     public function destroy(Habits $habit)
     {
+        if ($habit->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
         $habit->delete();
 
         return redirect()->route('habits.index')

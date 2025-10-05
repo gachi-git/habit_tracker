@@ -62,7 +62,7 @@
             @endif
 
             <!-- 統計カード -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
@@ -106,26 +106,15 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="text-3xl font-bold text-orange-600">{{ $totalCurrentStreak }}</div>
+                            <div class="text-3xl font-bold text-orange-600">{{ $activeStreakCount }}</div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-600">合計ストリーク</div>
-                                <div class="text-xs text-gray-500">連続日数</div>
+                                <div class="text-sm font-medium text-gray-600">アクティブストリーク数</div>
+                                <div class="text-xs text-gray-500">継続中の習慣</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="text-3xl font-bold text-indigo-600">{{ number_format($avgWeeklyCompletionRate, 0) }}%</div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-600">今週達成率</div>
-                                <div class="text-xs text-gray-500">平均</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- アクティブな習慣 -->
@@ -163,8 +152,17 @@
                                 <p class="text-sm text-gray-600 mb-1">{{ $habit->target_frequency }}回 / {{ $habit->target_unit === 'daily' ? '日' : ($habit->target_unit === 'weekly' ? '週' : '月') }}</p>
                                 
                                 <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                                    <span>🔥 {{ $habit->getCurrentStreak() }}日連続</span>
-                                    <span>📊 {{ number_format($habit->getThisWeekCompletionRate(), 0) }}%</span>
+                                    @php
+                                        $streakUnit = match($habit->target_unit) {
+                                            'daily' => '日',
+                                            'weekly' => '週',
+                                            'monthly' => '月',
+                                            default => '日'
+                                        };
+                                        $primaryRate = $habit->getPrimaryCompletionRate();
+                                    @endphp
+                                    <span>🔥 {{ $habit->getCurrentStreak() }}{{ $streakUnit }}連続</span>
+                                    <span>📊 {{ number_format($primaryRate['rate'], 0) }}% ({{ $primaryRate['label'] }})</span>
                                 </div>
                                 
                                 <div class="flex justify-between items-center">

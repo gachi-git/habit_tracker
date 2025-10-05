@@ -68,7 +68,7 @@ class HabitRecordsController extends Controller
             'duration_minutes' => $request->duration_minutes,
         ]);
 
-        return back()->with('success', '記録を追加しました！');
+        return redirect('/dashboard')->with('success', '記録を追加しました！');
     }
 
     /**

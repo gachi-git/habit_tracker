@@ -17,7 +17,13 @@ class HabitsFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => \App\Models\User::factory(),
+            'category_id' => null,
+            'name' => $this->faker->sentence(3),
+            'description' => $this->faker->paragraph(),
+            'target_frequency' => $this->faker->numberBetween(1, 5),
+            'target_unit' => $this->faker->randomElement(['daily', 'weekly', 'monthly']),
+            'is_active' => true,
         ];
     }
 }

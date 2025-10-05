@@ -47,7 +47,7 @@ class CategoriesController extends Controller
         }
 
         $habits = $category->habits()
-            ->withCount('records')
+            ->withCount('habitRecords')
             ->get();
 
         return view('categories.show', compact('category', 'habits'));
@@ -86,6 +86,12 @@ class CategoriesController extends Controller
     {
         if ($category->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        // 習慣が紐づいている場合は削除不可
+        if ($category->habits()->count() > 0) {
+            return redirect()->route('categories.index')
+                ->with('error', 'このカテゴリには習慣が紐づいているため削除できません。');
         }
 
         $category->delete();
