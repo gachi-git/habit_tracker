@@ -241,6 +241,58 @@
                 </div>
             </div>
             @endif
+
+            <!-- グラフセクション（テスト用） -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">進捗トレンド</h3>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Chart.js 実データグラフ
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const chartData = @json($chartData);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: '完了した習慣数',
+                        data: chartData.data,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: Math.max(chartData.totalHabits, 5),
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '過去7日間の習慣完了数'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

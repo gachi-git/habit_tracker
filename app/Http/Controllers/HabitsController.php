@@ -56,6 +56,9 @@ class HabitsController extends Controller
             }
         }
         
+        // 過去7日間のグラフデータを生成
+        $chartData = $this->generateWeeklyChartData($activeHabits);
+        
         return view('dashboard', compact(
             'activeHabits', 
             'totalHabits', 
@@ -65,7 +68,8 @@ class HabitsController extends Controller
             'totalRecordsThisWeek',
             'avgWeeklyCompletionRate',
             'categories',
-            'categoryFilter'
+            'categoryFilter',
+            'chartData'
         ));
     }
 
@@ -133,5 +137,38 @@ class HabitsController extends Controller
 
         return redirect()->route('habits.index')
             ->with('success', '習慣を削除しました。');
+    }
+
+    private function generateWeeklyChartData($activeHabits)
+    {
+        $labels = [];
+        $data = [];
+        
+        // 過去7日間のデータを生成
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $labels[] = $date->format('n/j'); // 月/日形式
+            
+            // その日に完了した習慣の数をカウント
+            $completedCount = 0;
+            foreach ($activeHabits as $habit) {
+                $record = $habit->habitRecords()
+                    ->where('recorded_date', $date->format('Y-m-d'))
+                    ->where('completed', true)
+                    ->first();
+                
+                if ($record) {
+                    $completedCount++;
+                }
+            }
+            
+            $data[] = $completedCount;
+        }
+        
+        return [
+            'labels' => $labels,
+            'data' => $data,
+            'totalHabits' => $activeHabits->count()
+        ];
     }
 }
