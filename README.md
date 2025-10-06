@@ -1,61 +1,62 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ネクストエンジニアカタパルト Phase01 課題
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 挑戦した課題
 
-## About Laravel
+[] 初級
+[✅] 上級
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 実装した内容
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+日々の習慣を記録・管理し、継続をサポートするWebアプリケーション。
+習慣の作成から記録、統計分析まで包括的な機能を提供する。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 基本機能
+- **習慣管理**: 習慣の作成・編集・削除・アクティブ/非アクティブ切り替え
+- **カテゴリ管理**: 習慣を分類するためのカテゴリ作成・管理
+- **習慣記録**: 日々の実行記録（完了/未完了、実施時間、メモ）
+- **ユーザー認証**: Laravel Breezeによる認証システム
 
-## Learning Laravel
+### 統計・分析機能
+- **ストリーク計算**: 日次・週次・月次習慣に対応した連続記録数の計算
+- **達成率計算**: target_unit別の適切な期間での達成率表示
+- **ダッシュボード**: 習慣の概要統計とアクティブストリーク数
+- **進捗グラフ**: Chart.jsによる過去7日間の完了数推移
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### その他機能
+- **target_unit対応**: 日次・週次・月次習慣の個別最適化表示
+- **カテゴリフィルタ**: ダッシュボードでのカテゴリ別表示
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## デプロイ先の URL または画面収録したファイル名
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+nec202508phase0100　古賀優将.mov
 
-## Laravel Sponsors
+## 操作手順
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **ユーザー登録/ログイン**: アカウントを作成してログイン
+2. **カテゴリ作成**: 習慣を分類するためのカテゴリを作成
+3. **習慣作成**: 目標頻度（日次・週次・月次）を設定して習慣を作成
+4. **表示**: ダッシュボードに作成した習慣が表示される(ストリーク数や達成率をダッシュボードで確認可能)
+5. **記録**: ダッシュボードに表示されるそれぞれの習慣の記録から記録可能。「今日完了」ボタンで簡単記録
+6. **詳細確認**: ダッシュボードのそれぞれの習慣から達成率・最近7日間の活動など詳細が確認できる
 
-### Premium Partners
+## 工夫した点
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### ユーザビリティ
+- **ワンクリック記録**: ダッシュボードから「今日完了」ボタンで即座に記録可能
+- **直感的な視覚表現**: 完了状況を緑/グレーの四角で一目で判別可能
+- **カテゴリ色分け**: 習慣をカテゴリごとに色で区別して視認性向上
 
-## Contributing
+### 継続をサポートする仕組み
+- **進捗の可視化**: Chart.jsによる7日間トレンドグラフで継続状況を把握
+- **ストリーク表示**: 連続記録数で達成感とモチベーションを向上
+- **統計情報**: 総実行回数や平均実施時間で長期的な成果を実感
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 苦戦した点
 
-## Code of Conduct
+- **ストリーク計算ロジック**: 日次・週次・月次で異なる連続性判定の実装
+- **Carbon日付処理**: 週次・月次習慣での適切な期間計算  
+- **UI/UXの統一**: target_unitに応じた表示内容の最適化
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Phase01 終えての感想
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+最終課題が形になって、まずは一安心。まだまだ多くのことを学べると思うし、理解が浅い部分もあるので、何度も復習して身につけていきたい。これから先も気を抜かずにやり続ける。
